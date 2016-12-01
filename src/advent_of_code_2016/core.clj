@@ -25,10 +25,10 @@
 
 (defn eval-instr [{:keys [dir] :as state} i]
   (let [[reldir offset] (read-instr i)
-        idx (new-dir-idx dir reldir)
-        ndir (get dirs idx)
-        new-state ((ndir movements) state offset)]
-    (assoc new-state :dir idx)))
+        new-idx (new-dir-idx dir reldir)
+        new-dir (get dirs new-idx)
+        new-state ((new-dir movements) state offset)]
+    (assoc new-state :dir new-idx)))
 
 
 
