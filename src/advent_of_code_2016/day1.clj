@@ -1,4 +1,4 @@
-(ns advent-of-code-2016.core)
+(ns advent-of-code-2016.day1)
 
 
 (def dirs  [:n :e :s :w])
