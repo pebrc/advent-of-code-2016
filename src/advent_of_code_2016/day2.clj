@@ -30,8 +30,8 @@ DURLRRRDRULDLULUDULUURURRLULUDLURURDDURULLRRUUDLRURLDLRUDULDLLRRULLLLRRLRUULDLDL
       \R (new-state inc identity))))
 
 (defn one-digit [[ds _ _ :as s] ms]
-  (let [r (reduce move s (seq ms))
-        newdigits (conj ds (last (get r 0)))]
+  (let [[nds _ _ :as r] (reduce move s (seq ms))
+        newdigits (conj ds (last nds))]
     (update-in r [0] (constantly newdigits))))
 
 
