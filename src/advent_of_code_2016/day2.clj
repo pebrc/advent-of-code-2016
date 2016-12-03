@@ -2,7 +2,9 @@
   (:import (java.io BufferedReader StringReader)))
 
 
-(def grid [[1 4 7] [2 5 8] [3 6 9]])
+(def ^:dynamic grid [[1 4 7] [2 5 8] [3 6 9]])
+
+(def actual-keypad '[[nil nil 5 nil nil] [nil 2 6 A nil] [1 3 7 B D] [nil 4 8 C nil] [nil nil 9 nil nil]])
 
 (def sample-puzzle "ULL
 RRDDD
@@ -35,8 +37,12 @@ DURLRRRDRULDLULUDULUURURRLULUDLURURDDURULLRRUUDLRURLDLRUDULDLLRRULLLLRRLRUULDLDL
     (update-in r [0] (constantly newdigits))))
 
 
-(defn day2 [s]
+(defn day2-part1 [s]
   (reduce one-digit [[] 1 1]  (parse-input s)))
 
-(comment (day2 puzzle))
+(defn day2-part2 [s]
+  (with-bindings {#'grid actual-keypad}
+    (reduce one-digit [[] 0 2] (parse-input s))))
+
+
 
