@@ -1607,9 +1607,21 @@
    (map #(->> (re-seq #"[0-9]+" %)
               (map read-string)))))
 
-(defn day3 [s]
+(defn triangle?
+  [[x y z]] (and  (> (+ x y) z)
+                  (> (+ y z) x)
+                  (> (+ z x) y)))
+
+(defn day3-part1 [s]
   (->> (parse-input s)
-       (filter (fn [[x y z]] (and  (> (+ x y) z)
-                                   (> (+ y z) x)
-                                   (> (+ z x) y))))
+       (filter triangle?)
+       (count)))
+
+(defn day3-part2 [s]
+  (->> (parse-input s)
+       (reduce (fn [[c1 c2 c3] [x y z]]
+                 [(conj c1 x) (conj c2 y) (conj c3 z)]) [[] [] []] )
+       (reduce concat)
+       (partition 3)
+       (filter triangle?)
        (count)))
