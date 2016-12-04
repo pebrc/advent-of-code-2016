@@ -1,4 +1,5 @@
-(ns advent-of-code-2016.day1)
+(ns advent-of-code-2016.day1
+  (:require [clojure.string :as s]))
 
 
 (def dirs  [:n :e :s :w])
@@ -21,25 +22,66 @@
     (mod (mut s) (count dirs))))
 
 (defn read-instr [i]
-  [(keyword (clojure.string/lower-case (subs i 0 1))) (read-string (subs i 1))])
+  (let [trimmed (s/trim i)]
+    [(keyword (s/lower-case (subs trimmed 0 1)))
+     (read-string (subs trimmed 1))]))
 
-(defn eval-instr [{:keys [dir] :as state} i]
-  (let [[reldir offset] (read-instr i)
-        new-idx (new-dir-idx dir reldir)
+(defn eval-instr [{:keys [dir] :as state} [reldir offset]]
+  (let [new-idx (new-dir-idx dir reldir)
         new-dir (get dirs new-idx)
         new-state ((new-dir movements) state offset)]
     (assoc new-state :dir new-idx)))
 
 
+(defn taxicab-distance [coords]
+  (+ (Math/abs (:x coords)) (Math/abs (:y coords))))
 
 (defn day1 [coords]
   (->> coords
        (reduce eval-instr {:dir 0 :x 0 :y 0})
-       (#(+ (Math/abs (:x %)) (Math/abs (:y %))))))
+       (taxicab-distance)))
+
 
 (defn parse-input-str [i]
   (->>
-       (clojure.string/split i  #",")
-       (map clojure.string/trim)))
+   (clojure.string/split i  #",")
+   (map read-instr)))
 
-(day1 (parse-input-str input))
+
+(comment (day1 (parse-input-str input)))
+
+
+
+(defn interpolate-steps [acc {:keys [x y] :as next}]
+  (if (seq acc)
+    (let [{px :x py :y } (last acc)
+          dx (- x px)
+          dy (- y py)
+          step (fn [k f acc n]
+                 (loop [res acc c (last acc) n n]
+                   (if (>= 0 n) res
+                       (let [ns (update c k f)]
+                         (recur (conj res ns) ns (dec n)))
+                       )))
+          step-fn (fn [d] (if (> 0 d) dec inc))]
+      (if (= 0 dx)
+        (step :y (step-fn dy) acc (Math/abs dy))
+        (step :x (step-fn dx) acc (Math/abs dx))))
+    (conj acc next)))
+
+
+(defn day1-part2 [input]
+            (->> (parse-input-str input)    
+                 (reductions eval-instr {:dir 0 :x 0 :y 0})
+                 (reduce interpolate-steps [])
+                 (reduce (fn [acc state] (let [pos (select-keys state [:x :y])]
+                                           (if (contains? acc pos)
+                                             (reduced pos)
+                                             (conj acc pos)))) #{})
+                 (taxicab-distance)))
+
+
+
+
+(comment (day1-part2 input))
+
