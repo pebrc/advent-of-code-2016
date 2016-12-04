@@ -27,9 +27,7 @@
 
 (defn day3-part2 [s]
   (->> (parse-input s)
-       (reduce (fn [[c1 c2 c3] [x y z]]
-                 [(conj c1 x) (conj c2 y) (conj c3 z)]) [[] [] []] )
-       (reduce concat)
+       (apply mapcat vector)
        (partition 3)
        (filter triangle?)
        (count)))
