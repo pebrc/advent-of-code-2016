@@ -18,16 +18,19 @@
 (defn relevant? [h]
   (s/starts-with? h "00000"))
 
+
+
+
+
+
 (defn day5-part1
   []
-  (first
-   (last
-    (take 9 (iterate
-             (fn [[p n]]
-               (let [[new-idx h] (first
-                                  (drop-while
-                                   #(not (relevant? (second %))) (next-hash n)))]
-                 [(str p (get h 5)) new-idx])) ["" 0])))))
+  (->> (range)
+     (map #(md5 (str secret %)))
+     (filter relevant?)
+     (map #(nth % 5))
+     (take 8)
+     (apply str)))
 
 (defn parse-char [c]
   (if-let [c c] 
@@ -63,7 +66,7 @@
        (apply str)))
 
 
-
+(day5-part2)
 
 
 
