@@ -12,13 +12,11 @@
 
 (defn error-correct [cmp]
   (->> input
-       (map seq)
        (apply map vector)
        (map #(->> %
                   frequencies
                   (sort-by val cmp)
-                  first
-                  first))
+                  ffirst))
        (apply str)))
 
 (defn day6-part1
