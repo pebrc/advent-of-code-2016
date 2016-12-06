@@ -13,14 +13,9 @@
 
 (def secret "wtnhxymk")
 
-(defn next-hash [i] (iterate (fn [[idx h]] [(inc idx) (md5 (str secret idx))]) [i ""]))
 
 (defn relevant? [h]
   (s/starts-with? h "00000"))
-
-
-
-
 
 
 (defn day5-part1
@@ -45,28 +40,22 @@
 (defn available? [i p]
   (nil? (get p i)))
 
-(defn day5-part2 []
-  (->> (take 9 (iterate
-                (fn [[p n]]
-                  (let [[new-idx h] (first
-                                     (drop-while
-                                      (fn [[_ h]]
-                                        (let [i (parse-char (get h 5))]
-                                          (not
-                                           (and
-                                            (relevant? h)
-                                            (valid? i)
-                                            (available? i p)))))
-                                      (next-hash n)))]
-                    [(assoc p (parse-char (get h 5)) (get h 6)) new-idx])) [{} 0]))
-       (last)
-       (first)
-       (into (sorted-map))
-       vals
-       (apply str)))
 
+(defn day5-part2 [l]
+  (->> (range)
+     (map #(md5 (str secret %)))
+     (filter relevant?)     
+     (map #(vector (parse-char (nth % 5)) (nth % 6)))
+     (filter (fn [[idx _]] (valid? idx)))
+     (reduce (fn [acc [idx v]]
+               (let [res (if (available? idx acc)
+                         (assoc acc idx v)
+                         acc)]
+                 (if (= l (count res))
+                   (reduced (apply str (vals (sort res))))
+                   res))) {})))
 
-(day5-part2)
+(comment (day5-part2 8))
 
 
 
