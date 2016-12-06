@@ -1,7 +1,6 @@
 (ns advent-of-code-2016.day6
   (:require [clojure.java.io :as io]
-            [clojure.string :as s])
-  (:import (java.io BufferedReader StringReader))))
+            [clojure.string :as s]))
 
 (def input
   (-> "day6.txt"
@@ -11,14 +10,21 @@
       s/split-lines))
 
 
-(defn day6-part1
-  []
+(defn error-correct [cmp]
   (->> input
        (map seq)
        (apply map vector)
        (map #(->> %
                   frequencies
-                  (sort-by val >)
+                  (sort-by val cmp)
                   first
                   first))
        (apply str)))
+
+(defn day6-part1
+  []
+  (error-correct >))
+
+(defn day6-part2
+  []
+  (error-correct <))
