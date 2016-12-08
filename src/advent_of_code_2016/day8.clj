@@ -45,11 +45,28 @@
       s/trim
       s/split-lines)))
 
+(defn swipe []
+  (reduce (fn [grid cmd] (cmd grid)) (display 50 6) (parse-commands input)))
+
 (defn day8-part1 []
-  (->> (reduce (fn [grid cmd] (cmd grid)) (display 50 6) (parse-commands input))
+  (->> (swipe)
        flatten
        (filter #(= % :on))
        count))
+
+(defn print [display]
+  (letfn [(print-row [r]
+            (apply str (map #(case %
+                               :on "#"
+                               :off " ") r)))]
+    (->> display
+         (map print-row)
+         (s/join "\n"))))
+
+(defn day8-part2 []
+  (println (->> (swipe)
+                print)))
+
 
 
 
