@@ -15,13 +15,14 @@
 
 
 (defn parse-marker [m]
-  (let [[l r] (split-with #(not= % \x) m)]
-    (mapv chars-to-int [l (rest r)])))
+  (let [[l r] (s/split m #"x")]
+    (mapv chars-to-int [l r])))
 
 
 (defn decompress-marker [[i x] s]
   (let [[h t] (split-at i s)]
     [(flatten (repeat x h)) t]))
+
 
 (defn decompress [in]
   (letfn
@@ -29,7 +30,7 @@
          #(case _
             \( (decomp acc input)            
             nil acc
-            (consume acc r)))
+            (consume acc input)))
        (consume [acc input]
          (let [[uchars r] (split-with #(not= % \() input)
                uc (apply str uchars)
@@ -44,4 +45,33 @@
            #(init (str acc (apply str uc)) t)))]
     (trampoline init "" in)))
 
-(count  (decompress input))
+(defn day9-part1 [] (count  (decompress input)))
+
+
+(defn starts-with-marker? [s] (= \( (first input)))
+
+(defn has-marker? [s] (s/index-of s \())
+
+(has-marker? "lsk(jf)")
+
+
+(defn marker-expand-1 [s]
+  (let [[rmk r] (s/split s #"\)" 2)
+        [idx rpt] (parse-marker rmk)]
+    [(apply str (repeat rpt (subs r 0 idx))) (subs r idx)]))
+
+(declare memoized-part2)
+
+(defn day9-part2 [in]
+  (loop [acc 0 input in]
+    (cond
+      (empty? input) acc
+      (starts-with-marker? input) (let [[exp r] (marker-expand-1 (subs input 1))]
+                                    (if (has-marker? exp)
+                                      (recur (+ acc (memoized-part2 exp)) r)
+                                      (recur (+ acc (count exp)) r)))
+      :else (recur (inc acc) (rest input)))))
+
+(def memoized-part2 (memoize day9-part2))
+
+(day9-part2 input)
