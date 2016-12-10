@@ -47,13 +47,9 @@
 
 (defn day9-part1 [] (count  (decompress input)))
 
-
 (defn starts-with-marker? [s] (= \( (first input)))
 
 (defn has-marker? [s] (s/index-of s \())
-
-(has-marker? "lsk(jf)")
-
 
 (defn marker-expand-1 [s]
   (let [[rmk r] (s/split s #"\)" 2)
@@ -74,4 +70,4 @@
 
 (def memoized-part2 (memoize day9-part2))
 
-(day9-part2 input)
+#_(day9-part2 input)

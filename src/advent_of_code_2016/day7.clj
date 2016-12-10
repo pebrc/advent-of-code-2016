@@ -26,8 +26,7 @@
               (and (s/starts-with? s "[" )
                    (re-find abbas s))       (reduced false)
               (re-find abbas s)             true
-              :else (or r  false)
-              ))
+              :else (or r  false)))
           false
           secs))
 
