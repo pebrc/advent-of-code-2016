@@ -8,27 +8,54 @@
      res#))
 
 
+(set! *warn-on-reflection* true)
+
 (def input (mapv #(re-seq #"-*\w+" %) (line-seq (io/reader (io/resource "day12.txt")))))
 
-;(defn to-int [s] (Integer/parseInt s))
 
-(defn eval-instr [s [cmd x y]]
+(defn parse-args [x]
+  (if (>= (int (first x)) (int \a))
+    (first x)
+    (Integer/parseInt x)))
+
+(defn parse-input [in]
+  (mapv (fn [[cmd & r]] (into [cmd] (map parse-args r))) in))
+
+
+(defn reg [^long c] (mod c 96))
+
+(defn ^Long reg-or-val [^longs s x]
+  (if (number? x) x (aget s (reg (int x)))))
+
+(defn eval-instr [^longs s [cmd x y]]
   (case cmd
-    "cpy" (-> (assoc s y (get s x (read-string x)))
-               (update :sp inc))
-    "inc" (-> (update s x inc)
-               (update :sp inc))
-    "dec" (-> (update s x dec)
-               (update :sp inc))
-    "jnz" (if (not= (get s x) 0)
-            (update s :sp + (to-int y))
-            (update s :sp inc))))
+    "cpy" (do (aset s (reg (int y)) (reg-or-val s x) )
+              (aset s 0 (inc (aget s 0))))
+    "inc" (do (aset s (reg (int x)) (inc (aget s (reg (int x)))))
+              (aset s 0  (inc (aget s 0))))
+    "dec" (do (aset s (reg (int x)) (dec (aget s (reg (int x)))))
+              (aset s 0 (inc (aget s 0))))
+    "jnz" (if (not= (aget s (reg (int x))) 0)
+            (aset s 0  (int (+ y (aget s 0))))
+            (aset s 0 (inc (aget s 0))))))
 
-(defn day12-part1 [input]
-  (loop [s {:sp 0 "a" 0 "b" 0 "d" 0}]
-    (if-let [instr (get input (:sp s))]
-      (recur (spy (eval-instr s (spy instr))))
-      s)))
+(defn compute [input start-state]
+  (let [s (long-array (into [0] (vals (sort start-state))))]
+    (loop [instr (get input 0)]
+      (if instr
+        (do (eval-instr s instr)
+            (recur (get input (aget s 0))))
+        (vec s)))))
 
 
-#_(day12-part1 input)
+(defn day12-part1 []
+  (nth (compute (parse-input input) {:a 0 :b 0 :c 0 :d 0}) 1))
+
+#_(day12-part1) ;;1193ms
+
+(defn day12-part2 []
+  (nth (compute (parse-input input) {:a 0 :b 0 :c 1 :d 0}) 1))
+
+#_(day12-part2) ;;38579ms
+
+
