@@ -1,12 +1,6 @@
 (ns advent-of-code-2016.day12
   (:require [clojure.java.io :as io]))
 
-(defmacro spy [f]
-  `(let [res# ~f]
-     (println (apply str (repeat 10 "-" )))
-     (println  '~f "->" res#)
-     res#))
-
 
 (set! *warn-on-reflection* true)
 
