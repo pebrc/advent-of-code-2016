@@ -1,15 +1,8 @@
 (ns advent-of-code-2016.day5
-  (:require [clojure.string :as s])
-  (:import java.security.MessageDigest
-           java.math.BigInteger))
+  (:require [clojure.string :as s]
+            [advent-of-code-2016.core :refer :all]))
 
-(defn md5 [s]
-  (let [algorithm (MessageDigest/getInstance "MD5")
-        size (* 2 (.getDigestLength algorithm))
-        raw (.digest algorithm (.getBytes s))
-        sig (.toString (BigInteger. 1 raw) 16)
-        padding (apply str (repeat (- size (count sig)) "0"))]
-    (str padding sig)))
+
 
 (def secret "wtnhxymk")
 
