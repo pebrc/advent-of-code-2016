@@ -10,7 +10,7 @@
 
 (defn cell-cost [fav xy]
   (if (wall? fav xy)
-    10000
+    100000
     1))
 
 (defn neighbors [xy]
@@ -25,14 +25,24 @@
 (defn estimate-cost [step-cost target [x y]]
   (Math/abs (* step-cost (- (apply + target ) x y))))
 
+(defn target? [target xy node]
+  (= target xy))
 
+(def target [31 39])
 
-#_(a/bfs [1 1] #(= % [7 4]) (partial non-wall-neighbors 10))
+#_ (get-in (a/bfs [1 1] (partial target? [7 4]) (partial non-wall-neighbors 10)) [7 4])
 
-#_(a/bfs [1 1] #(= % [31 39]) (partial non-wall-neighbors input))
+#_ (get-in (a/bfs [1 1] (partial target? target) (partial non-wall-neighbors input)) target)
 
 #_ (a/astar [1 1] [31 39] neighbors  estimate-cost 900 (partial cell-cost input))
 
 #_ (a/astar [1 1] [7 4] neighbors estimate-cost 900 (partial cell-cost 10))
 
 
+;;part2
+#_(->> (a/bfs [1 1] (fn [_ n] (>= (:dist n) 50)) (partial non-wall-neighbors input))
+     vals
+     (mapcat vals)
+     (mapcat :xys)
+     set
+     count)

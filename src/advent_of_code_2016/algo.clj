@@ -1,7 +1,6 @@
 (ns advent-of-code-2016.algo)
 
 
-
 (defn total-cost [estimate-cost newcost step-cost-est target xy]
   (+ newcost
      (estimate-cost step-cost-est target xy)))
@@ -18,12 +17,10 @@
             coll)))
 
 (defn done? [target work-queue]
-  (let [_ (println "done?" (:cost target) (first work-queue) (count work-queue))]
-    (or
-     (empty? work-queue)
-     (if-let [goal (:cost target)]
-        (< goal (first (min-by first work-queue)))
-        false))))
+  (or
+   (empty? work-queue)
+   (when-let [goal (:cost target)]
+     (< goal (first (min-by first work-queue))))))
 
 (defn astar [start-xy target neighbors estimate-cost step-est cell-cost]
   (loop [steps 0
@@ -55,13 +52,12 @@
 (defn bfs [start-xy goal? neighbors]
   (loop [q (conj (clojure.lang.PersistentQueue/EMPTY) start-xy)
          routes (assoc-in {} start-xy {:xys [start-xy] :dist 0})]
-    (let [curr (peek q)]
-      (if (goal? curr)
-        (get-in routes curr) 
-        (let [cur-node (get-in routes curr)
-              nbr-xys (neighbors curr)
-              new-nbrs (filter #(nil? (get-in routes %)) nbr-xys)
-              _ (println new-nbrs cur-node)]
+    (let [cur-xy (peek q)
+          cur-node (get-in routes cur-xy)]
+      (if (goal? cur-xy cur-node )
+        routes
+        (let [nbr-xys (neighbors cur-xy)
+              new-nbrs (filter #(nil? (get-in routes %)) nbr-xys)]
           (recur (into (pop q) new-nbrs)
                  (reduce (fn [rs xy] (assoc-in
                                       rs
