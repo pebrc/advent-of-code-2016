@@ -1,4 +1,5 @@
-(ns advent-of-code-2016.algo)
+(ns advent-of-code-2016.algo
+  (:require [advent-of-code-2016.core :refer :all]))
 
 
 (defn total-cost [estimate-cost newcost step-cost-est target xy]
@@ -49,18 +50,22 @@
 
  
 
-(defn bfs [start-xy goal? neighbors]
-  (loop [q (conj (clojure.lang.PersistentQueue/EMPTY) start-xy)
-         routes (assoc-in {} start-xy {:xys [start-xy] :dist 0})]
-    (let [cur-xy (peek q)
-          cur-node (get-in routes cur-xy)]
-      (if (goal? cur-xy cur-node )
-        routes
-        (let [nbr-xys (neighbors cur-xy)
-              new-nbrs (filter #(nil? (get-in routes %)) nbr-xys)]
-          (recur (into (pop q) new-nbrs)
-                 (reduce (fn [rs xy] (assoc-in
-                                      rs
-                                      xy
-                                      {:xys (conj (:xys cur-node) xy)
-                                       :dist (inc (:dist cur-node))})) routes  new-nbrs)))))))
+(defn bfs
+  ([start-xy goal? neighbors]
+   (bfs start-xy goal? neighbors identity))
+  ([start-xy goal? neighbors coords]
+           (loop [q (conj (clojure.lang.PersistentQueue/EMPTY) start-xy)
+                  routes (assoc-in {} (coords start-xy) {:xys [start-xy] :dist 0})]
+             (let [cur (spy (peek q))
+                   cur-xy (coords cur)
+                   cur-node (get-in routes cur-xy)]
+               (if (goal? cur cur-node )
+                 routes
+                 (let [nbr-xys (neighbors cur)
+                       new-nbrs (filter #(nil? (get-in routes (coords %))) nbr-xys)]
+                   (recur (into (pop q) new-nbrs)
+                          (reduce (fn [rs xy] (assoc-in
+                                               rs
+                                               (coords xy)
+                                               {:xys (conj (:xys cur-node) xy)
+                                                :dist (inc (:dist cur-node))})) routes  new-nbrs))))))))
